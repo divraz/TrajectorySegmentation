@@ -17,8 +17,8 @@ video_path = f"{DATA_PATH}dataset/videos"
 action_path = f"{DATA_PATH}dataset/actions"
 gripper_path = f"{DATA_PATH}dataset/gripper"
 
-fps = 10
-res = (230, 230)
+fps = 5
+res = (224, 224)
 
 def with_opencv(filename):
     video = cv2.VideoCapture(filename)
@@ -66,6 +66,8 @@ def map_to_csv (data):
 
     tasks = [name for name in os.listdir (f"{data_path}")]
     for task in tqdm(tasks, desc = "Converting tasks"):
+        if not os.path.exists (f"{json_path}/{task}"):
+            os.makedirs(f"{json_path}/{task}")
         variations = [name for name in os.listdir (f"{data_path}/{task}")]
         for variation in variations:
             episodes = [name for name in os.listdir (f"{data_path}/{task}/{variation}/episodes/")]
@@ -75,7 +77,7 @@ def map_to_csv (data):
                 # maintain a map for reference
                 temp = {'data_path' : temp_path, "auto_id": hashlib.md5 (temp_path.encode ()).hexdigest ()}
                 writer_map.write (temp)
-                writer = jsonlines.open (f"{json_path}/{temp['auto_id']}.jsonl", mode = "w")
+                writer = jsonlines.open (f"{json_path}/{task}/{temp['auto_id']}.jsonl", mode = "w")
                 #print (temp)
             
                 # copy images to centralized video folder with md5 after converting to video
@@ -98,10 +100,10 @@ def map_to_csv (data):
                     change_point[x][1] = max (change_point[x][1], i)
                 
                 for i, value in change_point.items ():
-                    #value[0] = math.floor(value[0] / fps)
-                    #value[1] = math.ceil(value[1] / fps)
-                    value[0] = value[0] / fps
-                    value[1] = value[1] / fps
+                    value[0] = math.floor(value[0] / fps)
+                    value[1] = math.ceil(value[1] / fps)
+                    #value[0] = value[0] / fps
+                    #value[1] = value[1] / fps
 
                     #if value[1] < duration:
                     #    value[1] += 2
@@ -137,7 +139,8 @@ def map_to_csv (data):
                                     "duration": duration + 2,
                                     "vid": temp['auto_id'],
                                     "relevant_windows": [change_point[i]],
-                                    "relevant_clip_ids": [int(i/2) for i in range ((int(change_point[i][0])//2)*2, int(change_point[i][1]), 2)]
+                                    #"relevant_clip_ids": [int(i/2) for i in range ((int(change_point[i][0])//2)*2, int(change_point[i][1]), 2)]
+                                    "relevant_clip_ids": [int(i) for i in range (int(change_point[i][0]), int(change_point[i][1]) + 1)]
                             }
                             query['qid'] = hashlib.md5 (query['query'].encode ()).hexdigest ()
                             query['saliency_scores'] = [[4, 4, 4] for i in range (len (query['relevant_clip_ids']))]

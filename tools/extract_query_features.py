@@ -5,7 +5,7 @@ import jsonlines
 import numpy as np
 from transformers import AutoTokenizer, CLIPTextModel
 
-DATA_PATH = "/media/draj5/Segmentation/rlbench_data/"
+DATA_PATH = "/media/draj5/DATA/rlbench_data/"
 model = CLIPTextModel.from_pretrained("openai/clip-vit-base-patch32")
 tokenizer = AutoTokenizer.from_pretrained("openai/clip-vit-base-patch32")
 
@@ -26,10 +26,12 @@ def extract_features (qid, query):
 
 def extract_files (dir_name):
     files = os.listdir (dir_name)
-    for name in tqdm (files, desc = "Extracting Text Features"):
+    for name in tqdm (files, desc = dir_name):
         reader = jsonlines.open (f"{dir_name}{name}")
         for data in reader:
             extract_features (data['qid'], data['query'])
 
 if __name__ == '__main__':
-    extract_files (f"{DATA_PATH}dataset/json/")
+    files = os.listdir (f"{DATA_PATH}dataset/json/")
+    for folder in files:
+        extract_files (f"{DATA_PATH}dataset/json/{folder}/")
