@@ -27,8 +27,6 @@ class SPushButtons(Task):
         self.boundaries = Shape('push_buttons_boundary')
         # goal_conditions merely state joint conditions for push action for
         # each button regardless of whether the task involves pushing it
-        self.goal_conditions = [CustomJointCondition(self.target_joints[n], 0.003)
-                                for n in range(3)]
 
         self.register_waypoint_ability_start(0, self._move_above_next_target)
         self.register_waypoints_should_repeat(self._repeat)
@@ -39,20 +37,23 @@ class SPushButtons(Task):
         for w in self.target_wraps:
             w.set_color([1.0, 0.0, 0.0])
         # For each color permutation, we want to have 1, 2 or 3 buttons pushed
+        self.goal_conditions = [CustomJointCondition(self.target_joints[n], 0.003)
+                                for n in range(3)]
 
         color_choice = np.random.choice(list(range(len(colors))),
             size=3, replace=False)
-        
+        self.buttons_pushed = 0
+
         self.buttons_to_push = 3
-        self.color_names = []
-        self.color_rgbs = []
-        self.chosen_colors = []
+        color_names = []
+        color_rgbs = []
+        chosen_colors = []
         i = 0
         for b in self.target_buttons:
             color_name, color_rgb = colors[color_choice[i]]
-            self.color_names.append(color_name)
-            self.color_rgbs.append(color_rgb)
-            self.chosen_colors.append((color_name, color_rgb))
+            color_names.append(color_name)
+            color_rgbs.append(color_rgb)
+            chosen_colors.append((color_name, color_rgb))
             b.set_color(color_rgb)
             i += 1
 
@@ -65,32 +66,32 @@ class SPushButtons(Task):
             [ConditionSet(self.success_conditions, True, False)])
         self.register_change_point_conditions(self.success_conditions)
 
-        rtn0 = 'push the %s button' % self.color_names[0]
-        rtn1 = 'press the %s button' % self.color_names[0]
-        rtn2 = 'push down the button with the %s base' % self.color_names[0]
+        rtn0 = 'push the %s button' % color_names[0]
+        rtn1 = 'press the %s button' % color_names[0]
+        rtn2 = 'push down the button with the %s base' % color_names[0]
         for i in range(self.buttons_to_push):
             if i == 0:
                 continue
             else:
-                rtn0 += ', then push the %s button' % self.color_names[i]
-                rtn1 += ', then press the %s button' % self.color_names[i]
-                rtn2 += ', then the %s one' % self.color_names[i]
+                rtn0 += ', then push the %s button' % color_names[i]
+                rtn1 += ', then press the %s button' % color_names[i]
+                rtn2 += ', then the %s one' % color_names[i]
 
         self.register_instructions([
             [
-                'Push the %s button' % self.color_names[0],
-                'Push the %s button' % self.color_names[1],
-                'Push the %s button' % self.color_names[2],
+                'Push the %s button' % color_names[0],
+                'Push the %s button' % color_names[1],
+                'Push the %s button' % color_names[2],
             ],
             [
-                'Activate the %s button' % self.color_names[0],
-                'Activate the %s button' % self.color_names[1],
-                'Activate the %s button' % self.color_names[2],
+                'Activate the %s button' % color_names[0],
+                'Activate the %s button' % color_names[1],
+                'Activate the %s button' % color_names[2],
             ],
             [
-                'SKILL_PUSH_%s' % self.color_names[0],
-                'SKILL_PUSH_%s' % self.color_names[1],
-                'SKILL_PUSH_%s' % self.color_names[2],
+                'SKILL_PUSH_%s' % color_names[0],
+                'SKILL_PUSH_%s' % color_names[1],
+                'SKILL_PUSH_%s' % color_names[2],
             ]
         ])
 
@@ -101,7 +102,7 @@ class SPushButtons(Task):
         num_non_targets = 3 - self.buttons_to_push
         spare_colors = list(set(colors)
                             - set(
-            [self.chosen_colors[i] for i in range(self.buttons_to_push)]))
+            [chosen_colors[i] for i in range(self.buttons_to_push)]))
 
         spare_color_rgbs = []
         for i in range(len(spare_colors)):

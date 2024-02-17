@@ -27,7 +27,7 @@ from rlbench.const import DATA_PATH
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('save_path',
-                    f"{DATA_PATH}data",
+                    f"{DATA_PATH}data_random",
                     'Where to save the demos.')
 flags.DEFINE_list('tasks', ['s_setup_chess'],
                   'The tasks to collect. If empty, all tasks are collected.')
@@ -49,7 +49,8 @@ flags.DEFINE_string(
 def check_and_make(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
-
+        return False
+    return True
 
 def save_demo(demo, example_path):
 
@@ -279,6 +280,10 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
         for ex_idx in range(FLAGS.episodes_per_task):
             print('Process', i, '// Task:', task_env.get_name(),
                   '// Variation:', my_variation_count, '// Demo:', ex_idx)
+            episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
+            if (check_and_make (episode_path)):
+                print ('exists')
+                continue
             attempts = 10
             while attempts > 0:
                 try:
@@ -300,7 +305,6 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                     tasks_with_problems += problem
                     abort_variation = True
                     break
-                episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
                 with file_lock:
                     save_demo(demo, episode_path)
                 break

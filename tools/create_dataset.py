@@ -27,7 +27,7 @@ from rlbench.const import DATA_PATH
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('save_path',
-                    f"{DATA_PATH}data",
+                    f"{DATA_PATH}data_random",
                     'Where to save the demos.')
 flags.DEFINE_list('tasks', ['s_block_pyramid', #1
                             's_shape_sorter', #2
@@ -56,7 +56,7 @@ flags.DEFINE_list('image_size', [224, 224],
 flags.DEFINE_enum('renderer',  'opengl3', ['opengl', 'opengl3'],
                   'The renderer to use. opengl does not include shadows, '
                   'but is faster.')
-flags.DEFINE_integer('processes', 5,
+flags.DEFINE_integer('processes', 3,
                      'The number of parallel processes during collection.')
 flags.DEFINE_integer('episodes_per_task', 250,
                      'The number of episodes to collect per task.')
@@ -69,6 +69,8 @@ flags.DEFINE_string(
 def check_and_make(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
+        return False
+    return True
 
 
 def save_demo(demo, example_path):
@@ -244,7 +246,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     rlbench_env = Environment(
         action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
         obs_config=obs_config,
-        #randomize_every=rand_every, frequency=frequency, visual_randomization_config=vrc, 
+        randomize_every=rand_every, frequency=frequency, visual_randomization_config=vrc, 
         headless=True)
     rlbench_env.launch()
 
@@ -299,6 +301,10 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
         for ex_idx in range(FLAGS.episodes_per_task):
             print('Process', i, '// Task:', task_env.get_name(),
                   '// Variation:', my_variation_count, '// Demo:', ex_idx)
+            episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
+            if (check_and_make (episode_path)):
+                print ('exists')
+                continue
             attempts = 10
             while attempts > 0:
                 try:
@@ -320,7 +326,6 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                     tasks_with_problems += problem
                     abort_variation = True
                     break
-                episode_path = os.path.join(episodes_path, EPISODE_FOLDER % ex_idx)
                 with file_lock:
                     save_demo(demo, episode_path)
                 break

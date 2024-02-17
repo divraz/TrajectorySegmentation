@@ -43,4 +43,4 @@ SUPPORTED_ROBOTS = {
     'ur5': (UR5, Robotiq85Gripper, 6),
 }
 
-DATA_PATH = "/media/draj5/DATA/rlbench_data/"
+DATA_PATH = "/home/local/ASUAD/draj5/rlbench_data/"
