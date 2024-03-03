@@ -8,11 +8,12 @@ from pyrep.objects.shape import Shape
 from rlbench.backend.conditions import DetectedCondition, NothingGrasped, CustomConditionSet
 from rlbench.backend.task import Task
 from rlbench.const import colors
-
+from rlbench.backend.spawn_boundary import SpawnBoundary
 
 class SPutItemInDrawer(Task):
 
     def init_task(self) -> None:
+        self.boundaries = [Shape('stack_blocks_boundary')]
         self._options = ['bottom', 'middle', 'top']
         self._anchors = [Dummy('waypoint_anchor_%s' % opt)
                          for opt in self._options]
@@ -57,6 +58,9 @@ class SPutItemInDrawer(Task):
                 NothingGrasped(self.robot.gripper)
             ])
         ])
+
+        b = SpawnBoundary(self.boundaries)
+        b.sample(self._item, min_distance=0.1)
 
         self.register_instructions([
             [

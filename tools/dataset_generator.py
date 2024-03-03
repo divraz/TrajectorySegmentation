@@ -225,7 +225,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     rlbench_env = Environment(
         action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
         obs_config=obs_config,
-        #randomize_every=rand_every, frequency=frequency, visual_randomization_config=vrc, 
+        randomize_every=rand_every, frequency=frequency, visual_randomization_config=vrc, 
         headless=True)
     rlbench_env.launch()
 

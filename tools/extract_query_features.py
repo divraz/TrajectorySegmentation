@@ -5,13 +5,13 @@ import jsonlines
 import numpy as np
 from transformers import AutoTokenizer, CLIPTextModel
 
-DATA_PATH = "/media/draj5/DATA/rlbench_data/"
+DATA_PATH = "/home/local/ASUAD/draj5/rlbench_data/"
 model = CLIPTextModel.from_pretrained("openai/clip-vit-base-patch32")
 tokenizer = AutoTokenizer.from_pretrained("openai/clip-vit-base-patch32")
 
 def extract_features (qid, query):
 
-    path = f"{DATA_PATH}dataset/features/clip_text_features/"
+    path = f"{DATA_PATH}dataset_random/features/clip_text_features/"
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -32,6 +32,6 @@ def extract_files (dir_name):
             extract_features (data['qid'], data['query'])
 
 if __name__ == '__main__':
-    files = os.listdir (f"{DATA_PATH}dataset/json/")
+    files = os.listdir (f"{DATA_PATH}dataset_random/json/")
     for folder in files:
-        extract_files (f"{DATA_PATH}dataset/json/{folder}/")
+        extract_files (f"{DATA_PATH}dataset_random/json/{folder}/")

@@ -31,13 +31,14 @@ def with_opencv(filename):
 def save_video(path, hash_id, name):
     img_path = [name for name in os.listdir(path)]
     duration = len (img_path) / fps
+    #return int (duration)
     img_path = sorted(img_path, key = lambda x: int(x.split('.')[0]))
     img_path = img_path + [img_path[-1]] * (2*fps)
     images = [cv2.imread(f"{path}/{x}") for x in img_path]
     x = [a for a in images if a is None]
     if len (x) > 0:
         print (path)
-    #return duration
+    
     height, width, channels = images[0].shape
 
     os.makedirs(os.path.dirname(video_path + '/'), exist_ok=True)
@@ -57,12 +58,12 @@ def save_video(path, hash_id, name):
 def save_action(hash_id, action):
     action += [[0.0] * 21] * (2*fps)
     os.makedirs(os.path.dirname(action_path + '/'), exist_ok=True)
-    np.savez (f"{action_path}/{hash_id}", features = np.array(action, dtype='float32')[::fps])
+    np.savez (f"{action_path}/{hash_id}", features = np.array(action, dtype='float32')[::(2*fps)])
 
 def save_gripper(hash_id, gripper):
     gripper += [[0.0] * 16] * (2*fps)
     os.makedirs(os.path.dirname(gripper_path + '/'), exist_ok=True)
-    np.savez (f"{gripper_path}/{hash_id}", features = np.array(gripper, dtype='float32')[::fps])
+    np.savez (f"{gripper_path}/{hash_id}", features = np.array(gripper, dtype='float32')[::(2*fps)])
 
 def std_dev (test_list):
     mean = sum(test_list) / len(test_list) 
@@ -151,8 +152,8 @@ def map_to_csv (i, task):
                                 "duration": duration + 2,
                                 "vid": temp['auto_id'],
                                 "relevant_windows": [change_point[i]],
-                                #"relevant_clip_ids": [int(i/2) for i in range ((int(change_point[i][0])//2)*2, int(change_point[i][1]), 2)]
-                                "relevant_clip_ids": [int(i) for i in range (int(change_point[i][0]), int(change_point[i][1]) + 1)]
+                                "relevant_clip_ids": [int(i/2) for i in range ((int(change_point[i][0])//2)*2, int(change_point[i][1]), 2)]
+                                #"relevant_clip_ids": [int(i) for i in range (int(change_point[i][0]), int(change_point[i][1]) + 1)]
                         }
                         query['qid'] = hashlib.md5 (query['query'].encode ()).hexdigest ()
                         query['saliency_scores'] = [[4, 4, 4] for i in range (len (query['relevant_clip_ids']))]
@@ -161,9 +162,9 @@ def map_to_csv (i, task):
                         print ('exception', temp_path, e)
             writer.close ()
     writer_map.close ()
-    print (task, 'duration', len(duration_stats), min(duration_stats), max(duration_stats), sum(duration_stats)/len(duration_stats), std_dev(duration_stats))
-    print (task, 'skills', len(skill_stats), min(skill_stats), max(skill_stats), sum(skill_stats)/len(skill_stats), std_dev(skill_stats))
-
+    #print (task, 'duration', len(duration_stats), min(duration_stats), max(duration_stats), sum(duration_stats)/len(duration_stats), std_dev(duration_stats))
+    #print (task, 'skills', len(skill_stats), min(skill_stats), max(skill_stats), sum(skill_stats)/len(skill_stats), std_dev(skill_stats))
+    print (task, f"$250$ & ${min(duration_stats)}$ & ${max(duration_stats)}$ & ${sum(duration_stats)/len(duration_stats)}_{{pm{{{std_dev(duration_stats)}}}}}$ & ${len(skill_stats)}$ & ${min(skill_stats)}$ & ${max(skill_stats)}$ & ${sum(skill_stats)/len(skill_stats)}_{{pm{{{std_dev(skill_stats)}}}}}$")
 if __name__ == '__main__':
     
     os.makedirs(os.path.dirname(json_path + '/'), exist_ok=True)
