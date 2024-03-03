@@ -32,6 +32,7 @@ Code changes to added randomization to just the background and the hand. This wi
 
 20 new tasks have been added, that are modified versions of exixting tasks. These tasks have change point along with change point instructions.
 
+- s_ball_in_hoop
 - s_block_pyramid
 - s_shape_sorter
 - s_stack_blocks
@@ -48,14 +49,13 @@ Code changes to added randomization to just the background and the hand. This wi
 - s_set_table
 - s_ball_in_hoop
 - s_put_item_in_drawer
-- s_light_bulb_in
 - s_insert_usb_in_computer
 - s_place_cups
 - s_slide_objects
 
 ## Generate Dataset
 
-[Dataset Generator](https://github.com/divraz/TrajectorySegmentation/blob/master/tools/dataset_generator.py) Code can be used to generate dataset. It will have domain randomization enabled for all the tasks.
+[Dataset Generator](https://github.com/divraz/TrajectorySegmentation/blob/master/tools/create_dataset.py) Code can be used to generate dataset. It will have domain randomization enabled for all the tasks.
 
 # RLBench: Robot Learning Benchmark [![Unit Tests](https://github.com/stepjam/RLBench/workflows/Unit%20Tests/badge.svg)](https://github.com/stepjam/RLBench/actions) [![Task Tests](https://github.com/stepjam/RLBench/workflows/Task%20Tests/badge.svg)](https://github.com/stepjam/RLBench/actions) [![Discord](https://img.shields.io/discord/694945190867370155.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/DXPCjmd)
 
